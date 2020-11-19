@@ -1,10 +1,11 @@
-﻿using RhapsodyServer.DB;
+using RhapsodyServer.DB;
 using RhapsodyServer.Event.Attributes;
 using RhapsodyServer.Event.Base;
 using RhapsodyServer.Event.Structs;
 using RhapsodyServer.Proton;
 using RhapsodyServer.Structs;
 using System.Linq;
+using System.Timers;
 
 namespace RhapsodyServer.Event.Handler
 {
@@ -55,9 +56,18 @@ namespace RhapsodyServer.Event.Handler
 
                         Player.Name = drop.Username;
                         Player.Password = drop.Password;
-                        Player.SendSound("piano_nice.wav");
-                        Player.SendHelloPacket();
+                        Player.SendGrowID();
+                        Player.SendSound("piano_nice");
                         Player.Save();
+                        Player.SendConsoleMessage("`5Please wait! Redirecting..");
+
+                        Timer timer = new Timer(2000);
+                        timer.Start();
+                        timer.Elapsed += (sender, e) =>
+                        {
+                            Player.SendHelloPacket();
+                            timer.Dispose();
+                        };
 
                         break;
                     }
