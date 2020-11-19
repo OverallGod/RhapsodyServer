@@ -1,4 +1,4 @@
-﻿using ENet.Managed;
+using ENet.Managed;
 using Evzer.Utilities;
 using MongoDB.Bson.Serialization.Attributes;
 using RhapsodyServer.DB;
@@ -14,8 +14,7 @@ namespace RhapsodyServer.Client
     [BsonIgnoreExtraElements]
     public class Player
     {
-        [BsonIgnore]
-        public ENetPeer Peer { get; set; }
+        internal ENetPeer Peer { get; set; }
 
         public string Name { get; set; } = "";
         public string Password { get; set; } = "";
@@ -25,9 +24,9 @@ namespace RhapsodyServer.Client
         public string DisplayName => ColorName + Name;
         public string CurrentWorld { get; set; } = "EXIT";
 
-        public bool InLobby { get; set; }
-        public bool InDialog { get; set; }
-        public bool RotatingLeft { get; set; }
+        internal bool InLobby { get; set; }
+        internal bool InDialog { get; set; }
+        internal bool RotatingLeft { get; set; }
         
         public int Gems { get; set; }
         public int NetId { get; set; }
@@ -41,7 +40,7 @@ namespace RhapsodyServer.Client
         {
             Pos = Vector2.Zero;
             Clothes = new Clothes();
-            Inventory = new Inventory();
+            Inventory = new Inventory(this);
 
             peer.SetUserData(this);
             Peer = peer;
@@ -109,6 +108,13 @@ namespace RhapsodyServer.Client
         public void SendTextOverlay(string text)
         {
             VariantList var = new VariantList() { "OnTextOverlay", text };
+
+            Send(var);
+        }
+
+        public void SendGrowID()
+        {
+            VariantList var = new VariantList() { "SetHasGrowID", 1, Name, Password };
 
             Send(var);
         }
