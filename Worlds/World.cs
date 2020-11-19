@@ -98,7 +98,7 @@ namespace RhapsodyServer.Worlds
                 tank.Write((short)drop.Value.ItemId);
                 tank.Write(drop.Value.Pos);
                 tank.Write((short)drop.Value.Amount);
-                tank.Write(drop.Value.Id);
+                tank.Write(drop.Key);
             }
 
             player.Send(tank);
