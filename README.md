@@ -11,7 +11,7 @@ Currently only drop & collect is working
 Feel free to modify the code and etc but be sure to credit me!
 
 # REQUIREMENTS
-You need to install MongoDB in order to 
+You need to install MongoDB
 
 # DISCLAIMER
 YOU ARE NOT ALLOWED TO SELL THIS SOURCE
