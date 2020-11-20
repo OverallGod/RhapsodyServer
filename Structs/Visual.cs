@@ -1,4 +1,4 @@
-﻿using RhapsodyServer.Client;
+using RhapsodyServer.Client;
 using RhapsodyServer.Packet;
 using RhapsodyServer.Proton;
 using RhapsodyServer.Worlds;
@@ -17,11 +17,11 @@ namespace RhapsodyServer.Structs
 
         public static void ApplyCollect(Player player, World world, int dropId, Vector2 position)
         {
-            var newPos = player.Pos - position;
+            var newPos = new Vector2(Math.Abs(position.X - player.Pos.X), Math.Abs(position.Y - player.Pos.Y));
 
-            if (newPos.Y > 35 && newPos.X > 35) // checks
+            if (newPos.Y > 35 || newPos.X > 35) // checks
             {
-                player.SendTalkBubble($"`0Too far away");
+                player.SendTalkBubble($"`0Too far away``");
                 return;
             }
 
@@ -88,6 +88,7 @@ namespace RhapsodyServer.Structs
             }
             else
             {
+                Console.WriteLine(dropId);
                 player.SendTalkBubble("`0Too far away");
             }
         }
@@ -105,7 +106,7 @@ namespace RhapsodyServer.Structs
                     return;
 
                 player.Inventory.Remove(item, (int)amount);
-                player.Inventory.Modify(player.Peer);
+                player.Inventory.Modify();
             }
 
             Random rand = new Random();
