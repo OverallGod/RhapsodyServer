@@ -1,4 +1,4 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson.Serialization.Options;
 using RhapsodyServer.Client;
 using RhapsodyServer.DB;
@@ -6,6 +6,7 @@ using RhapsodyServer.Packet;
 using RhapsodyServer.Proton;
 using RhapsodyServer.ServerCore;
 using RhapsodyServer.Structs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,13 +18,12 @@ namespace RhapsodyServer.Worlds
     {
         public int Width { get; set; }
         public int Height { get; set; }
+        public int Weather { get; set; }
         public string Name { get; set; }
         
         public Block[] Blocks { get; set; }
 
-        [BsonIgnore]
-        public List<Player> Players { get; set; } = new List<Player>();
-
+        internal List<Player> Players { get; set; } = new List<Player>();
 
         [BsonDictionaryOptions(DictionaryRepresentation.ArrayOfArrays)]
         public Dictionary<int, DroppedItem> DroppedItems { get; set; } = new Dictionary<int, DroppedItem>();
@@ -101,6 +101,9 @@ namespace RhapsodyServer.Worlds
                 tank.Write(drop.Key);
             }
 
+            tank.Write(0x0);
+            tank.Write(Weather); // weather
+
             player.Send(tank);
             
             foreach (var block in blocks)
@@ -144,7 +147,7 @@ namespace RhapsodyServer.Worlds
 
             player.SendSpawn(pos);
             player.SendClothes();
-            player.Inventory.Send(player.Peer);
+            player.Inventory.Send();
         }
 
         public void RemovePlayer(Player player)
