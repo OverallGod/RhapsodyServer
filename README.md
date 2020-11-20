@@ -11,7 +11,7 @@ Currently only drop & collect is working
 Feel free to modify the code and etc but be sure to credit me!
 
 # DISCLAIMER
-YOU ARE NOT TO SELL THIS SOURCE
+YOU ARE NOT ALLOWED TO SELL THIS SOURCE
 
 # FEATURES
 
