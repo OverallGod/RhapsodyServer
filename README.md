@@ -2,7 +2,7 @@
 
 Growtopia Server made in C#
 
-**Information**
+# Information
 
 Just a simple project i made with C#, with MongoDB as the database
 
@@ -13,7 +13,7 @@ Feel free to modify the code and etc but be sure to credit me!
 # DISCLAIMER
 YOU ARE NOT TO SELL THIS SOURCE
 
-**FEATURES**
+# FEATURES
 
 Good framework
 
