@@ -1,8 +1,11 @@
-﻿using ENet.Managed;
+using ENet.Managed;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson.Serialization.Options;
+using RhapsodyServer.DB;
 using RhapsodyServer.Packet;
+using RhapsodyServer.Worlds;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace RhapsodyServer.Client
 {
@@ -17,8 +20,16 @@ namespace RhapsodyServer.Client
         private int ModifiedAmount = 0x0;
         private bool IsAdding = true;
 
+        internal Player Player { get; }
+        internal World World => Database.GetWorld(Player.CurrentWorld).Result;
+
+        internal Inventory(Player player) => Player = player;
+        public Inventory() { }
+
         public bool Add(int id, int amount)
         {
+            if (id == 0) return false;
+
             if (Find(id, out var a))
             {
                 if (a + amount > 200)
@@ -41,6 +52,8 @@ namespace RhapsodyServer.Client
 
         public bool Validate(int id, int amount)
         {
+            if (id == 0) return false;
+
             if (Find(id, out var a))
             {
                 return a + amount <= 200;
@@ -50,6 +63,8 @@ namespace RhapsodyServer.Client
 
         public bool Remove(int id, int amount)
         {
+            if (id == 0) return false;
+
             if (Find(id, out var a))
             {
                 if (a - amount > 0)
@@ -59,6 +74,21 @@ namespace RhapsodyServer.Client
                 else
                 {
                     Items.Remove(id);
+
+                    if (Tile.Parse(id).ActionType == 20)
+                    {
+                        var field = Player.Clothes.GetType().GetFields().FirstOrDefault(x => (int)x.GetValue(Player.Clothes) == id);
+
+                        if (field != null)
+                        {
+                            field.SetValue(Player.Clothes, 0);
+
+                            foreach (var ply in World.Players)
+                            {
+                                Player.SendClothes(ply, true);
+                            }
+                        }
+                    }
                 }
             }
             else return false;
@@ -70,7 +100,7 @@ namespace RhapsodyServer.Client
             return true;
         }
 
-        public void Send(ENetPeer peer)
+        public void Send()
         {
             int total = 8 + Items.Count * 4;
 
@@ -92,10 +122,10 @@ namespace RhapsodyServer.Client
                 tank.Write((short)item.Value);
             }
 
-            peer.Send(0, tank.Pack(), ENetPacketFlags.Reliable);
+            Player.Peer.Send(0, tank.Pack(), ENetPacketFlags.Reliable);
         }
 
-        public void Modify(ENetPeer peer)
+        public void Modify()
         {
             TankPacket tank = new TankPacket()
             {
@@ -107,7 +137,7 @@ namespace RhapsodyServer.Client
 
             data[IsAdding ? 7 : 6] = (byte)ModifiedAmount;
 
-            peer.Send(0, data, ENetPacketFlags.Reliable);
+            Player.Peer.Send(0, data, ENetPacketFlags.Reliable);
         }
 
         public bool Find(int id, out int amount) => Items.TryGetValue(id, out amount);
